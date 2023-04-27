@@ -147,28 +147,28 @@ library Pairing {
     }
 }
 
-//投票系统中智能合约部分的算法实现
+//Algorithm implementation of the smart contract part of the voting system
 contract voteSC{ 
     using Pairing for *;  
-    //设置候选人数量
+    //Set the number of candidates
     uint c;
-    //从区块链获取验证通过所有选民的资格硬币承诺类型
+    //Get the qualification coin commitment type of all voters from the blockchain
     bytes32[] comm_array;
-    //获取所有选民资格硬币承诺
+    //Get all voter eligibility coin promises
     function getComm() public view returns (bytes32[] memory comm){
         return comm_array;
     }
-   //投票密文结构体
+   //Vote ciphertext struct
     struct voteCt{
         Pairing.G1Point Ct0;
         Pairing.G1Point Ct1;
     }
     voteCt[] public voteCts;
 
-    //设置从区块链获取密文聚合结果类型
+    //Set the type of ciphertext aggregation result obtained from the blockchain
     Pairing.G1Point[] A0_array;
     Pairing.G1Point[] A1_array;
-    //获取密文聚合结果函数
+    //Obtain the ciphertext aggregation result function
     function getA0() public view returns (Pairing.G1Point[] memory A0){
         return A0_array;
     }
@@ -176,32 +176,32 @@ contract voteSC{
         return A1_array;
     }
 
-    //设置从区块链获取部分解密秘钥验证通过的数据类型
+    //Set the data type that passes the verification of the partial decryption key obtained from the blockchain
     Pairing.G1Point[] sig_array;
-    //获取验证通过的部分解密秘钥函数
+    //The partial decryption key function that passed the verification was obtained
     function getSig() public view returns (Pairing.G1Point[] memory Sig){
         return sig_array;
     }
   
-    //设置从区块链获取解密秘钥组件的数据类型
+    //Set the data type of the component that gets the decryption key from the blockchain
     Pairing.G1Point[] dk_array;
-    //获取解密秘钥组件dk
+    //Obtain the decryption secret key component dk
     function getDk() public view returns (Pairing.G1Point[] memory dk){
         return dk_array;
     }
 
-    //设置计票结果的结构体
+    //A structure that sets the count
      struct voteTally {
          uint name;
          Pairing.G1Point voteCount;
      }
 
-    //设置从区块链获取计票结果
+    //Set up to fetch the vote count from the blockchain
      voteTally[] public t_array;
   
-//智能合约函数实现  ..............................................................
+//Smart contract function implementation  ..............................................................
     
-    //验证资格硬币承诺的有效性
+    //Verify the validity of a qualification coin commitment
     function commVerify(string memory str, bytes32 comm) public returns(bool) {
         bytes32 hash = keccak256(abi.encodePacked(str));   
         if(hash == comm){           
@@ -210,16 +210,16 @@ contract voteSC{
         } 
     }
 
-    //聚合密文函数
+    //Aggregate ciphertext functions
     function ctAgg(uint w) public returns (Pairing.G1Point[] memory A0, Pairing.G1Point[] memory A1){    
         Pairing.G1Point[] memory A0 = new Pairing.G1Point[](c);
         Pairing.G1Point[] memory A1 = new Pairing.G1Point[](c);
-        //第一部分聚合
+        //Part I. Aggregation
         for(uint i = 0; i < c; i++){
             A0[i] = Pairing.addition(Pairing.scalar_mul(voteCts[i].Ct0,w),A0[i]);
             A0_array.push(A0[i]);
         }
-        //第二部分聚合
+        //Part II.Aggregation
         for(uint i = 0; i < c; i++){
             A1[i] = Pairing.addition(Pairing.scalar_mul(voteCts[i].Ct1,w),A1[i]);
             A1_array.push(A1[i]);
@@ -227,9 +227,9 @@ contract voteSC{
         return (A0, A1);
     }
 
-    //验证部分解密秘钥
+    //Verify the partial decryption secret key
     function sigVerify(Pairing.G1Point[] memory A0_array, Pairing.G2Point memory g2,Pairing.G1Point[] memory candidateSig_array, Pairing.G2Point[] memory vk) public returns (bool){
-        //获得候选人数量
+        //Get the number of candidates
         bool[] memory res = new bool[](c);                                      
         for(uint i = 0; i < c; i++){
             res[i] = Pairing.pairingProd2(A0_array[i], g2,candidateSig_array[i], vk[i]);  
@@ -242,10 +242,10 @@ contract voteSC{
         }            
     }
 
-    //聚合部分解密秘钥
+    //The partial decryption secret key is aggregated
     function dkAgg() public returns (Pairing.G1Point[] memory dk){
         Pairing.G1Point[] memory dk = new Pairing.G1Point[](c);       
-        //将候选人验证通过的解密秘钥进行聚合
+        //The decryption secret keys that pass the candidate verification are aggregated
         for(uint i = 0; i < c; i++){
             dk[i] = Pairing.addition(dk[i], sig_array[i]); 
             dk_array.push(dk[i]);          
@@ -253,11 +253,11 @@ contract voteSC{
     return dk;
     }
 
-    //计票
+    //Tally Phase
     function tallyVote() public returns (Pairing.G1Point[] memory t){
-        //定义存储选票结果的数组
+        //Defines an array to store the results of the ballot
         Pairing.G1Point[] memory t = new Pairing.G1Point[](c);
-        //解密秘钥的整理
+        //Decluttering the decryption key
         for(uint i = 0; i < c; i++){
             t[i] = Pairing.addition(A1_array[i], Pairing.negate(dk_array[i]));
             t_array.push(voteTally({

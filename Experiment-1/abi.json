@@ -1,0 +1,115 @@
+{
+  "inputs": [
+    {
+      "name": "VoteArra",
+      "public": true,
+      "type": "array",
+      "components": {
+        "size": 5,
+        "type": "array",
+        "components": {
+          "size": 256,
+          "type": "bool"
+        }
+      }
+    },
+    {
+      "name": "input1",
+      "public": true,
+      "type": "array",
+      "components": {
+        "size": 4,
+        "type": "u8"
+      }
+    },
+    {
+      "name": "condition1",
+      "public": true,
+      "type": "array",
+      "components": {
+        "size": 16,
+        "type": "bool"
+      }
+    },
+    {
+      "name": "left1",
+      "public": true,
+      "type": "array",
+      "components": {
+        "size": 8,
+        "type": "u32"
+      }
+    },
+    {
+      "name": "path1",
+      "public": true,
+      "type": "array",
+      "components": {
+        "size": 16,
+        "type": "array",
+        "components": {
+          "size": 8,
+          "type": "u32"
+        }
+      }
+    },
+    {
+      "name": "r",
+      "public": true,
+      "type": "array",
+      "components": {
+        "size": 5,
+        "type": "array",
+        "components": {
+          "size": 256,
+          "type": "bool"
+        }
+      }
+    },
+    {
+      "name": "pk",
+      "public": true,
+      "type": "array",
+      "components": {
+        "size": 5,
+        "type": "array",
+        "components": {
+          "size": 2,
+          "type": "field"
+        }
+      }
+    }
+  ],
+  "output": {
+    "type": "tuple",
+    "components": {
+      "elements": [
+        {
+          "type": "array",
+          "components": {
+            "size": 20,
+            "type": "array",
+            "components": {
+              "size": 2,
+              "type": "field"
+            }
+          }
+        },
+        {
+          "type": "array",
+          "components": {
+            "size": 8,
+            "type": "u32"
+          }
+        },
+        {
+          "type": "array",
+          "components": {
+            "size": 8,
+            "type": "u32"
+          }
+        }
+      ]
+    }
+  }
+}
