@@ -1,0 +1,64 @@
+from "ecc/babyjubjubParams" import BABYJUBJUB_PARAMS;
+import "ecc/edwardsScalarMult" as mul;
+import "hashes/sha256/sha256Padded";
+import "hashes/sha256/512bit" as hash;
+import "hashes/utils/256bitsDirectionHelper" as multiplex;
+import "ecc/babyjubjubParams.code" as context;
+import "ecc/edwardsScalarMult.code" as mult;
+import "ecc/edwardsAdd" as add;
+ 
+
+//MT_DEPTH：The depth of Merkle tree
+const u32 MT_DEPTH = 12;
+//NUM_C: The number of candidates
+const u32 NUM_C = 3;
+//The voting function
+/*
+The inputs consis of:
+-VoteArra: the vocter of ballots;
+-Comm: the commitment of the voter's token;
+-Condition: Left or Right branch;
+-leaf: the leaf node is the hash result on commitment and address of the voter;
+-path: the path from leaf to root in a Merkle tree;
+-rand: Randomness;
+-vsk: field
+*/
+def main(private bool[NUM_C][256] VoteArra, private u32[8] Comm, bool[MT_DEPTH] Condition, private u32[8] leaf, u32[8] root, u32[MT_DEPTH][8] path,
+ private bool[NUM_C][256] rand, field[NUM_C][2] pk, private u8[4] vsk)->(field[20][2], u32[8]) {	
+    
+    //Check the leaf node is included in the Merkle tree.  
+    u32[8] mut digest = leaf;
+    for u32 i in 0..MT_DEPTH {
+	    (u32[8], u32[8]) s = (Condition[i] ? path[i] : digest, Condition[i] ? digest : path[i]);
+	    digest = hash(s.0, s.1);        
+    }
+    assert (digest == root);
+
+    //Generate the serial number.
+    u32[8] addr = sha256Padded(vsk);
+    // A function that takes a u8[N] array as input, pads it,and returns the sha256 output as a u32[8]
+    u32[8] sn = hash(Comm,addr);
+    //Check the voting condition
+	field mut sum = 0;
+
+    field mut vot = 0;
+    for u32 i in 0..NUM_C{
+        vot = if VoteArra[i][0] == false {0} else {1};
+        assert(vot==0||vot==1);
+        sum = sum + vot;
+    }
+    assert (sum == 1);
+    //对候选人进行加密
+    field[NUM_C*2][2] mut Ct = [[0,0],[0,0],[0,0],[0,0],[0,0],[0,0]];
+    
+    field[2] G = [16540640123574156134436876038791482806971768689494387082833631921987005038935,
+	20819045374670962167435360035096875258406992893633759881276124905556507972311];
+    u32 mut k = 0;
+    for u32 i in 0..NUM_C{
+        Ct[k] = mult(rand[i],G,context());
+        k = k + 1;
+        Ct[k] = add(mult(rand[i],pk[0],context()), mult(VoteArra[i],G,context()),BABYJUBJUB_PARAMS);
+        k = k + 1;
+    }
+    return (Ct,sn);
+}
