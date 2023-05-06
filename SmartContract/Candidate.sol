@@ -2,6 +2,7 @@
 pragma solidity ^0.8.13;
 import "./EdOnBN254.sol";
 import "./Voter.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/Strings.sol";
 
 contract Candidate{
     using EdOnBN254 for *;
@@ -40,14 +41,21 @@ contract Candidate{
     */
 
 
-    function CandVerify(EdOnBN254.Affine memory pubKey,EdOnBN254.Affine[] memory decKeys,uint c,uint s,EdOnBN254.Affine[] memory R) public returns (bool)
+    function CandVerify(EdOnBN254.Affine memory pubKey,EdOnBN254.Affine[] memory decKeys,uint256  c,uint256  s,EdOnBN254.Affine[] memory R) public returns (bool)
     {
+       //verify c==c_res ?
+       bytes memory c_res="";
+       for(uint i = 0; i < R.length; i++){
+          bytes memory temp=abi.encodePacked(Strings.toString(R[i].x),Strings.toString(R[i].y));
+          c_res=abi.encodePacked(temp,c_res);
+       }
+       require(bytes32(c)==keccak256(c_res),"C!=C_res");
        EdOnBN254.Affine[] memory temp_res=new EdOnBN254.Affine[](3);
        temp_res[0]=EdOnBN254.mul(pubKey,c);
        temp_res[1]=EdOnBN254.add(temp_res[0],R[0]);
        temp_res[2]=EdOnBN254.mul(EdOnBN254.primeSubgroupGenerator(),s);
 
-        require((temp_res[1].x==temp_res[2].x)&&(temp_res[1].y ==temp_res[2].y ),"Verify pubKey^c*R==g^s No Passed!");
+       require((temp_res[1].x==temp_res[2].x)&&(temp_res[1].y ==temp_res[2].y ),"Verify pubKey^c*R==g^s No Passed!");
 
         for (uint i = 0; i < decKeys.length; i++) {
              temp_res[0]=EdOnBN254.mul(decKeys[i],c);
@@ -80,5 +88,25 @@ contract Candidate{
         }
 
         return true;
+    }
+
+
+    function toString(uint value) internal pure returns (string memory) {
+            if (value == 0) {
+                return "0";
+            }
+            uint temp = value;
+            uint digits;
+            while (temp != 0) {
+                digits++;
+                temp /= 10;
+            }
+            bytes memory buffer = new bytes(digits);
+            while (value != 0) {
+                digits -= 1;
+                buffer[digits] = bytes1(uint8(48 + uint(value % 10)));
+                value /= 10;
+            }
+            return string(buffer);
     }
 }

@@ -25,7 +25,7 @@ The inputs consis of:
 -ek: the aggregated encryption key from candidates' public keys
 */
 def main(private bool[NUM_C][256] VoteArra, private u32[8] Comm, bool[MT_DEPTH] Condition, private u32[8] leaf, u32[8] root, u32[MT_DEPTH][8] path,
- private bool[NUM_C][256] rand, field[2] ek, private u8[4] vsk)->(field[20][2], u32[8]) {	
+ private bool[NUM_C][256] rand, field[2] ek, private u8[4] vsk)->(field[6][2], u32[8]) {	
     
     //Check the leaf node is included in the Merkle tree.  
     u32[8] mut digest = leaf;
