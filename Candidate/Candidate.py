@@ -21,7 +21,7 @@
 
 
 from sapling_jubjub import *
-import hashlib
+import random
 
 from ed25519 import *
 import secrets
@@ -31,9 +31,10 @@ h_List=[]
 H_List=[]
 R_List=[]
 
-import pdb
+
 Bx=0x2B8CFD91B905CAE31D41E7DEDF4A927EE3BC429AAD7E344D59D2810D82876C32;
 By=0x2AAA6C24A758209E90ACED1F10277B762A7C1115DBC0E16AC276FC2C671A861F;
+q=21888242871839275222246405745257275088548364400416034343698204186575808495617;
 
 
 def toBin(x):
@@ -60,11 +61,11 @@ def KeyGen():
     # random generate generator h_i
     for i in range(CandidateNum):
         # random h_i
-        temp=Point()
+        temp=[random.randint(20,100),random.randint(20,100)]
         global h_List,H_List,sk
-        h_List.append(temp)
-        H_List.append(scalarmult(temp,sk))
-        print(i)
+        h_List.append(Point(temp[0],temp[1]))
+        H_List.append(PmulX(temp,sk))
+        # print(i)
 
     print("KeyGen Successful!")
 
@@ -74,18 +75,19 @@ def Prove():
     r=secrets.token_hex(32)#32bytes == 256bits
     # R=g^r
     R=publickey(r)
-    HashString+=R
+    HashString+=str(R[0])+str(R[1])
+    global h_List,R_List,sk
     for i in range(len(h_List)):
-        temp_R_i=scalarmult(h_List[i],r)
+        temp_R_i=PmulX([h_List[i].u,h_List[i].v],r)
         R_List.append(temp_R_i)
-        print("R_"+i+"= ",temp_R_i)
-        HashString+=temp_R_i
+        print("R_",i,"= [",str(temp_R_i[0]),",",str(temp_R_i[1])," ]")
+        HashString+=str(temp_R_i[0])+str(temp_R_i[1])
 #     compute hash value
     c=hash(HashString)
-    print("C= ",HashString)
+    print("C=",c)
 
 #     S=r+cx
-    s=r+c*sk
+    s = (int(r,16) + int(c) * int(sk,16)) % q
     print("S=",s)
 
 
@@ -95,27 +97,27 @@ def Prove():
 
 if __name__ == "__main__":
     print("Hello from Verivoting!")
-
+    '''
     KeyGen()
     '''
     while True:
-        str=input("(VeriVoting) ZKP>>")
-        if str.lower()=="quit" or str.lower()=="q":
+        str_input=input("(VeriVoting) ZKP>>")
+        if str_input.lower()=="quit" or str_input.lower()=="q":
             break
-        elif str.lower()=="setup":
+        elif str_input.lower()=="setup":
             Setup()
             print("Public Key:",pk)
             print("Private Key",sk)
-        elif str.lower()=="keygen":
+        elif str_input.lower()=="keygen":
             KeyGen()
-        elif str.startswith("prove"):
-            if(sk.__eq__(ZERO)):
+        elif str_input.startswith("prove"):
+            if(sk==0):
                 print("Please Setup First!")
                 continue
             Prove()
         else:
             print("Command not found. Try running 'help' to learn more.")
-    '''
+
 
 
 
