@@ -1,25 +1,3 @@
-'''   
-    copyright 2018 to the baby_jubjub_ecc Authors
-
-    This file is part of baby_jubjub_ecc.
-
-    baby_jubjub_ecc is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    baby_jubjub_ecc is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with baby_jubjub_ecc.  If not, see <https://www.gnu.org/licenses/>.
-'''
-
-
-
-
 from sapling_jubjub import *
 import random
 
@@ -32,9 +10,9 @@ H_List=[]
 R_List=[]
 
 
-Bx=0x2B8CFD91B905CAE31D41E7DEDF4A927EE3BC429AAD7E344D59D2810D82876C32;
-By=0x2AAA6C24A758209E90ACED1F10277B762A7C1115DBC0E16AC276FC2C671A861F;
-q=21888242871839275222246405745257275088548364400416034343698204186575808495617;
+Bx=0x2B8CFD91B905CAE31D41E7DEDF4A927EE3BC429AAD7E344D59D2810D82876C32
+By=0x2AAA6C24A758209E90ACED1F10277B762A7C1115DBC0E16AC276FC2C671A861F
+q=21888242871839275222246405745257275088548364400416034343698204186575808495617
 
 
 def toBin(x):
