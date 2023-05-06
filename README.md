@@ -1,5 +1,5 @@
 # VeriVoting
-This repository is an emulation test for smart contract side, along with candidate and voter side in VeriVoting.
+This repository is an simulation test for smart contract side, along with candidate and voter side in VeriVoting.
 
 The development tools we empolyed are:
 1. Online [**Remix**](https://remix.ethereum.org/) IDE environment is for the contract side, to verify voting transactions and decryption-key transactions;
