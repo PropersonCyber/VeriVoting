@@ -9,8 +9,7 @@ contract Candidate{
     //CandidateNum denote the number of Candidate
     uint CandidateNum;
     Voter public voter;
-    constructor(address VoterAddress, uint candi_num){
-        voter = Voter(VoterAddress);
+    constructor( uint candi_num){
         CandidateNum = candi_num;
     }
 
@@ -41,7 +40,7 @@ contract Candidate{
     */
 
 
-    function CandVerify(EdOnBN254.Affine memory pubKey,EdOnBN254.Affine[] memory decKeys,uint256  c,uint256  s,EdOnBN254.Affine[] memory R) public returns (bool)
+    function CandVerify(address VoterAddress,EdOnBN254.Affine memory pubKey,EdOnBN254.Affine[] memory decKeys,uint256  c,uint256  s,EdOnBN254.Affine[] memory R) public returns (bool)
     {
        //verify c==c_res ?
        bytes memory c_res="";
@@ -56,7 +55,7 @@ contract Candidate{
        temp_res[2]=EdOnBN254.mul(EdOnBN254.primeSubgroupGenerator(),s);
 
        require((temp_res[1].x==temp_res[2].x)&&(temp_res[1].y ==temp_res[2].y ),"Verify pubKey^c*R==g^s No Passed!");
-
+        voter = Voter(VoterAddress);
         for (uint i = 0; i < decKeys.length; i++) {
              temp_res[0]=EdOnBN254.mul(decKeys[i],c);
              temp_res[1]=EdOnBN254.add(temp_res[0],R[i+1]);
