@@ -9,7 +9,8 @@ import "ecc/edwardsAdd" as add;
  
 
 //MT_DEPTH：The depth of Merkle tree
-const u32 MT_DEPTH = 12;
+const u32 MT_DEPTH = 3;
+const u32 MT_DEPTH_N = MT_DEPTH - 1;
 //NUM_C: The number of candidates
 const u32 NUM_C = 3;
 //The voting function
@@ -24,12 +25,12 @@ The inputs consis of:
 -vsk: voter's seed key.
 -ek: the aggregated encryption key from candidates' public keys
 */
-def main(private bool[NUM_C][256] VoteArra, private u32[8] Comm, bool[MT_DEPTH] Condition, private u32[8] leaf, u32[8] root, u32[MT_DEPTH][8] path,
+def main(private bool[NUM_C][256] VoteArra, private u32[8] Comm, private bool[MT_DEPTH_N] Condition, private u32[8] leaf, u32[8] root, private u32[MT_DEPTH_N][8] path,
  private bool[NUM_C][256] rand, field[2] ek, private u8[4] vsk)->(field[6][2], u32[8]) {	
     
     //Check the leaf node is included in the Merkle tree.  
     u32[8] mut digest = leaf;
-    for u32 i in 0..MT_DEPTH {
+    for u32 i in 0..MT_DEPTH_N {
 	    (u32[8], u32[8]) s = (Condition[i] ? path[i] : digest, Condition[i] ? digest : path[i]);
 	    digest = hash(s.0, s.1);        
     }
@@ -44,9 +45,11 @@ def main(private bool[NUM_C][256] VoteArra, private u32[8] Comm, bool[MT_DEPTH] 
 	field mut sum = 0;
     field mut vot = 0;
     for u32 i in 0..NUM_C{
-        vot = if VoteArra[i][0] == false {0} else {1};
-        assert(vot==0||vot==1);
-        sum = sum + vot;
+        for u32 j in 0..256{
+            vot = if VoteArra[i][j] == false {0} else {1};
+            assert(vot==0||vot==1);
+            sum = sum + vot;
+        }
     }
     assert (sum == 1);
 
