@@ -18,9 +18,10 @@ pragma solidity ^0.8.13;
 library EdOnBN254 {
     uint256 public constant Q =
         21888242871839275222246405745257275088548364400416034343698204186575808495617;
-    uint256 public constant E_A = 1;
-    uint256 public constant E_D =
-        9706598848417545097372247223557719406784115219466060233080913168975159366771;
+    uint256 public constant E_A = 168700;
+    uint256 public constant E_D = 168696;
+    uint256 public constant    L =
+        2736030358979909402780800718157159386076813972158567259200215660948447373041;
 
     struct Affine {
         uint256 x;
@@ -46,7 +47,6 @@ library EdOnBN254 {
         Affine memory res= add(a1,a2);
         return (res.x,res.y);
     }
-
 
     function add(
         Affine memory a1,
