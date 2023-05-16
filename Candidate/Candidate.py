@@ -1,6 +1,6 @@
 from ed25519 import *
 import secrets
-from hashlib import sha3_256
+from Cryptodome.Hash import SHA256
 
 sk,pk=0,0
 Ct0_List=[]
@@ -57,7 +57,7 @@ def Prove():
     r_num = secrets.token_hex(32)#32bytes == 256bits
     h = H(sk)
     a = 2**(b-2) + sum(2**i * bit(h,i) for i in range(3,b-2))
-    r = Hint(''.join([h[i] for i in range(int(b // 8), int(b // 4))]) + str(r_num))
+    r = int(r_num, 16) % l
     R = scalarmult(B, r)
     print("R_ 0 =", R)
     HashString += str(R[0])+str(R[1])
@@ -68,8 +68,8 @@ def Prove():
         print("R_", i+1, "= [", str(temp_R_i[0]), ", ", str(temp_R_i[1]), " ]")
         HashString += str(temp_R_i[0]) + str(temp_R_i[1])
 #     compute hash value
-#     using sha3_256 to ensure that c have same value with  c' in solidity
-    c = Hint(sha3_256(HashString.encode()).hexdigest())
+#     using SHA256 to ensure that c have same value with  c' in solidity
+    c = int(SHA256.new(HashString.encode('utf-8')).hexdigest(), 16) % l
     print("C =",c)
     s = r + (c * a) % l
     print("S = ", s)
